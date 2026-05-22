@@ -13,4 +13,10 @@ public class MyController {
     ResponseEntity<?> greet() {
         return ResponseEntity.ok("Hello from AWS Hadson!");
     }
+@GetMapping("/binod")
+    ResponseEntity<?> binod() {
+        return ResponseEntity.ok("Hello from AWS Hadson! the CI/CD succeed");
+    }
+
+
 }
