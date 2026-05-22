@@ -45,13 +45,17 @@ jobs:
           # 1. Pull the fresh image
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/spring-boot-ci-demo:latest
           
-          # 2. Dynamic Port Cleanup: Find any container using port 8080 and stop/remove it
-          echo "Cleaning up containers using port 8080..."
-          CONTAINER_ID=$(docker ps -q --filter "publish=8080")
-          if [ ! -z "$CONTAINER_ID" ]; then
-            docker stop $CONTAINER_ID
-            docker rm $CONTAINER_ID
+          # 2. Cleanup by Port: Stop/Remove container blocking port 8080
+          PORT_CONTAINER=$(docker ps -q --filter "publish=8080")
+          if [ ! -z "$PORT_CONTAINER" ]; then
+            docker stop $PORT_CONTAINER
+            docker rm $PORT_CONTAINER
           fi
           
-          # 3. Run the new version
+          # 3. Cleanup by Name: Force remove any existing container named 'spring-demo'
+          # (This catches the one causing your current error)
+          docker stop spring-demo || true
+          docker rm -f spring-demo || true
+          
+          # 4. Run the new version
           docker run -d --name spring-demo -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/spring-boot-ci-demo:latest
